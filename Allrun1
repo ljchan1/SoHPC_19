@@ -1,0 +1,39 @@
+#!/bin/bash
+#SBATCH --partition gll_usr_prod
+#SBATCH --time=11:00:00
+#SBATCH --account=SoHPC_hpc19
+#SBATCH --job-name=rhoPimple
+#SBATCH --output=log.result
+#SBATCH -N 1
+#SBATCH --mem=100GB
+#SBATCH --ntasks-per-socket=18
+#SBATCH --sockets-per-node=2
+#SBATCH --ntasks-per-node=36
+
+
+#Written by Li Juan Chan 15th August 2019 for the Summer of HPC 2019 program.
+#This is the job script that run all the pipelines
+
+
+#Run the content.sh file with pipelines
+./content.sh 36 clip
+./content.sh 36 glyph_3D
+./content.sh 36 glyph_front
+./content.sh 36 glyph_top
+./content.sh 36 oneslice
+./content.sh 36 region
+./content.sh 36 streamline_front
+./content.sh 36 streamline_top
+./content.sh 36 threeslices
+
+#Store scripts and catalyst in the keep folder so that it will not be noticed by OpenFOAM
+#Change the controlDict to the one without including catalyst
+cd /gpfs/work/SoHPC_hpc19/nacaTest2/serverCineca.work/serverCineca_36/system/
+mv scripts/ keep/
+mv catalyst keep/
+mv controlDict controlDict_withcatalyst
+mv controlDict_nocatalyst controlDict
+cd /gpfs/work/SoHPC_hpc19/nacaTest2/serverCineca.work/serverCineca_36/
+
+#Run the content with no catalyst
+./content_nocatalyst.sh 36
